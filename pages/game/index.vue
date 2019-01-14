@@ -195,9 +195,9 @@ export default {
           this.moveToTheUp()
       }
     },
-    cellActive (prevEl, el, rate) {
-      this.cards[prevEl].num = this.cards[el].num * rate
-      this.cards[prevEl].active = true;
+    cellActive (nextEl, el, rate) {
+      this.cards[nextEl].num = this.cards[el].num * rate
+      this.cards[nextEl].active = true;
       this.cards[el].num = null
       this.cards[el].active = false;
       this.MoveActive = true
@@ -247,14 +247,14 @@ export default {
         var string = this.StringsDown[item]
         for (let el in string) {
           let card = string[el]
-          let cardPrev = string[+el+1]
+          let cardNext = string[+el+1]
           if (this.cards[card].num && this.cards[card].id !== string[3]) {
-            if (this.cards[cardPrev].num) {
-              if ( this.cards[card].num === this.cards[cardPrev].num) {
-              this.cellActive(cardPrev, card, 2)
+            if (this.cards[cardNext].num) {
+              if ( this.cards[card].num === this.cards[cardNext].num) {
+              this.cellActive(cardNext, card, 2)
               }
             } else {
-              this.cellActive(cardPrev, card, 1)
+              this.cellActive(cardNext, card, 1)
             }
           }
         }
@@ -269,14 +269,14 @@ export default {
         var string = this.StringsUp[item]
         for (let el in string) {
           let card = string[el]
-          let cardPrev = string[+el+1]
+          let cardNext = string[+el+1]
           if (this.cards[card].num && this.cards[card].id !== string[3]) {
-            if (this.cards[cardPrev].num) {
-              if ( this.cards[card].num === this.cards[cardPrev].num) {
-              this.cellActive(cardPrev, card, 2)
+            if (this.cards[cardNext].num) {
+              if ( this.cards[card].num === this.cards[cardNext].num) {
+              this.cellActive(cardNext, card, 2)
               }
             } else {
-              this.cellActive(cardPrev, card, 1)
+              this.cellActive(cardNext, card, 1)
             }
           }
         }
