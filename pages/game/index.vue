@@ -24,7 +24,11 @@
               :color="card.active ? colorActiveCard : colorCard"
               height="100"
               width="100">
-                {{card.num}}
+              <v-layout fill-height align-center justify-center>
+              <v-flex class="text-xs-center">
+                <h1>{{card.num}}</h1>
+                </v-flex>
+                </v-layout>
               </v-card>
             </v-flex>
           </v-layout>
@@ -43,6 +47,7 @@ export default {
       isGameStarted: false,
       colorCard: 'cyan darken-2',
       colorActiveCard: 'red',
+      MoveActive: false,
       StringsLeft: {
         FirstStringX: [3, 2, 1, 0],
         SecondStringX: [7, 6, 5, 4],
@@ -62,10 +67,10 @@ export default {
         FourdStringX: [3, 7, 11, 15],
       },
       StringsUp: {
-        FirstStringX: [15, 11, 7, 3],
-        SecondStringX: [14, 6, 6, 2],
-        TreeStringX: [13, 9, 5, 2],
-        FourdStringX: [12, 8, 4, 0],
+        FirstStringX: [12, 8, 4, 0],
+        SecondStringX: [13, 9, 5, 1],
+        TreeStringX: [14, 10, 6, 2],
+        FourdStringX: [15, 11, 7, 3],
       },
       cards: [
         {
@@ -154,11 +159,13 @@ export default {
   methods: {
     startGame () {
       this.isGameStarted = true
-      let newActiveCard = this.getNewActiveCard()
+      this.getNewActiveCard()
+      this.getNewActiveCard()
       window.addEventListener('keyup', this.logKey)
+      this.cardsClone = this.cards
     },
     getNewActiveCard () {
-      let newActiveCard = Math.floor(Math.random() * ((this.cards.length + 1) - 1)) + 1
+      let newActiveCard = Math.floor(Math.random() * ((this.cards.length + 1) - 1))
         if (this.cards[newActiveCard].active !== true) {
           this.cards[newActiveCard].active = true;
           this.cards[newActiveCard].num = this.randomNum()
@@ -188,6 +195,13 @@ export default {
           this.moveToTheUp()
       }
     },
+    cellActive (prevEl, el, rate) {
+      this.cards[prevEl].num = this.cards[el].num * rate
+      this.cards[prevEl].active = true;
+      this.cards[el].num = null
+      this.cards[el].active = false;
+      this.MoveActive = true
+    },
     moveToTheLeft () {
       for (let item in this.StringsLeft) {
         var string = this.StringsLeft[item]
@@ -195,21 +209,18 @@ export default {
           if (this.cards[el].num && this.cards[el].id !== string[3]) {
             if (this.cards[el-1].num) {
               if ( this.cards[el].num === this.cards[el-1].num) {
-              this.cards[el-1].num = this.cards[el].num*2
-              this.cards[el].num = null
-              this.cards[el-1].active = true;
-              this.cards[el].active = false;
+              this.cellActive(el-1, el, 2)
               }
             } else {
-              this.cards[el-1].num = this.cards[el].num
-              this.cards[el-1].active = true;
-              this.cards[el].num = null
-              this.cards[el].active = false;
+              this.cellActive(el-1, el, 1)
             }
           }
         })
       }
+      if (this.MoveActive) {
       let newActiveCard = this.getNewActiveCard()
+      this.MoveActive = false
+      }
     },
     moveToTheRight () {
       for (let item in this.StringsRight) {
@@ -218,70 +229,63 @@ export default {
           if (this.cards[el].num && this.cards[el].id !== string[3]) {
             if (this.cards[el+1].num) {
               if ( this.cards[el].num === this.cards[el+1].num) {
-              this.cards[el+1].num = this.cards[el].num*2
-              this.cards[el].num = null
-              this.cards[el+1].active = true;
-              this.cards[el].active = false;
+              this.cellActive(el+1, el, 2)
               }
             } else {
-              this.cards[el+1].num = this.cards[el].num
-              this.cards[el+1].active = true;
-              this.cards[el].num = null
-              this.cards[el].active = false;
+              this.cellActive(el+1, el, 1)
             }
           }
         })
       }
+      if (this.MoveActive) {
       let newActiveCard = this.getNewActiveCard()
-      //когда двигамем вправо не всегда двигается
+      this.MoveActive = false
+      }
     },
     moveToTheDown () {
        for (let item in this.StringsDown) {
         var string = this.StringsDown[item]
         for (let el in string) {
-          if (this.cards[string[el]].num && this.cards[[string[el]]].id !== string[3]) {
-            if (this.cards[[string[+el+1]]].num) {
-              if ( this.cards[[string[el]]].num === this.cards[[string[+el+1]]].num) {
-              this.cards[[string[+el+1]]].num = this.cards[[string[el]]].num*2
-              this.cards[[string[+el]]].num = null
-              this.cards[[string[+el+1]]].active = true;
-              this.cards[[string[+el]]].active = false;
+          let card = string[el]
+          let cardPrev = string[+el+1]
+          if (this.cards[card].num && this.cards[card].id !== string[3]) {
+            if (this.cards[cardPrev].num) {
+              if ( this.cards[card].num === this.cards[cardPrev].num) {
+              this.cellActive(cardPrev, card, 2)
               }
             } else {
-              this.cards[[string[+el+1]]].num = this.cards[[string[el]]].num
-              this.cards[[string[+el+1]]].active = true;
-              this.cards[[string[el]]].num = null
-              this.cards[[string[el]]].active = false;
+              this.cellActive(cardPrev, card, 1)
             }
           }
         }
       }
+      if (this.MoveActive) {
       let newActiveCard = this.getNewActiveCard()
+      this.MoveActive = false
+      }
     },
     moveToTheUp () {
       for (let item in this.StringsUp) {
         var string = this.StringsUp[item]
-        string.forEach(el => {
-          if (this.cards[el].num && this.cards[el].id !== string[3]) {
-            if (this.cards[el+1].num) {
-              if ( this.cards[el].num === this.cards[el+1].num) {
-              this.cards[el+1].num = this.cards[el].num*2
-              this.cards[el].num = null
-              this.cards[el+1].active = true;
-              this.cards[el].active = false;
+        for (let el in string) {
+          let card = string[el]
+          let cardPrev = string[+el+1]
+          if (this.cards[card].num && this.cards[card].id !== string[3]) {
+            if (this.cards[cardPrev].num) {
+              if ( this.cards[card].num === this.cards[cardPrev].num) {
+              this.cellActive(cardPrev, card, 2)
               }
             } else {
-              this.cards[el+1].num = this.cards[el].num
-              this.cards[el+1].active = true;
-              this.cards[el].num = null
-              this.cards[el].active = false;
+              this.cellActive(cardPrev, card, 1)
             }
           }
-        })
+        }
       }
+      if (this.MoveActive) {
       let newActiveCard = this.getNewActiveCard()
+      this.MoveActive = false
+      }
     }
-
   }
 }
 </script>
