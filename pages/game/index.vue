@@ -21,7 +21,8 @@
               xs3>
               <v-card flat 
               @keyup.left="moveToTheLeft"
-              :color="card.active ? colorActiveCard : colorCard"
+              light
+              :color="card.active ? card.colorActiveCard : colorCard"
               height="100"
               width="100">
               <v-layout fill-height align-center justify-center>
@@ -45,8 +46,7 @@ export default {
     return {
       size: 'lg',
       isGameStarted: false,
-      colorCard: 'cyan darken-2',
-      colorActiveCard: 'red',
+      colorCard: 'grey darken-2',
       MoveActive: false,
       StringsLeft: {
         FirstStringX: [3, 2, 1, 0],
@@ -76,82 +76,98 @@ export default {
         {
           id: 0,
           active: false,
-          num: null
+          num: null,
+          colorActiveCard: 'teal'
         },
         {
           id: 1,
           active: false,
-          num: null
+          num: null,
+          colorActiveCard: 'teal'
         },
         {
           id: 2,
           active: false,
-          num: null
+          num: null,
+          colorActiveCard: 'teal'
         },
         {
           id: 3,
           active: false,
-          num: null
+          num: null,
+          colorActiveCard: 'teal'
         },
         {
           id: 4,
           active: false,
-          num: null
+          num: null,
+          colorActiveCard: 'teal'
         },
         {
           id: 5,
           active: false,
-          num: null
+          num: null,
+          colorActiveCard: 'teal'
         },
         {
           id: 6,
           active: false,
-          num: null
+          num: null,
+          colorActiveCard: 'teal'
         },
         {
           id: 7,
           active: false,
-          num: null
+          num: null,
+          colorActiveCard: 'teal'
         },
         {
           id: 8,
           active: false,
-          num: null
+          num: null,
+          colorActiveCard: 'teal'
         },
         {
           id: 9,
           active: false,
-          num: null
+          num: null,
+          colorActiveCard: 'teal'
         },
         {
           id: 10,
           active: false,
-          num: null
+          num: null,
+          colorActiveCard: 'teal'
         },
         {
           id: 11,
           active: false,
-          num: null
+          num: null,
+          colorActiveCard: 'teal'
         },
         {
           id: 12,
           active: false,
-          num: null
+          num: null,
+          colorActiveCard: 'teal'
         },
         {
           id: 13,
           active: false,
-          num: null
+          num: null,
+          colorActiveCard: 'teal'
         },
         {
           id: 14,
           active: false,
-          num: null
+          num: null,
+          colorActiveCard: 'teal'
         },
         {
           id: 15,
           active: false,
-          num: null
+          num: null,
+          colorActiveCard: 'teal'
         }
       ]
     }
@@ -183,90 +199,34 @@ export default {
     logKey(e) {
       switch (e.keyCode) {
         case 37:
-          this.moveToTheLeft()
+          this.moveX(this.StringsLeft)
           break;
         case 39:
-          this.moveToTheRight()
+          this.moveX(this.StringsRight)
           break;
         case 40:
-          this.moveToTheDown()
+          this.moveX(this.StringsDown)
           break;
         case 38:
-          this.moveToTheUp()
+          this.moveX(this.StringsUp)
       }
     },
     cellActive (nextEl, el, rate) {
       this.cards[nextEl].num = this.cards[el].num * rate
-      this.cards[nextEl].active = true;
+      if (this.cards[nextEl].num < 32) {
+      this.cards[nextEl].colorActiveCard = 'teal  accent-' + (this.cards[nextEl].num / 4)
+      } else {
+        this.cards[nextEl].colorActiveCard = 'teal  darken-' + (this.cards[nextEl].num / 16)
+      }
+      this.cards[nextEl].active = true
       this.cards[el].num = null
-      this.cards[el].active = false;
+      this.cards[el].colorActiveCard = 'teal'
+      this.cards[el].active = false
       this.MoveActive = true
     },
-    moveToTheLeft () {
-      for (let item in this.StringsLeft) {
-        var string = this.StringsLeft[item]
-        string.forEach(el => {
-          if (this.cards[el].num && this.cards[el].id !== string[3]) {
-            if (this.cards[el-1].num) {
-              if ( this.cards[el].num === this.cards[el-1].num) {
-              this.cellActive(el-1, el, 2)
-              }
-            } else {
-              this.cellActive(el-1, el, 1)
-            }
-          }
-        })
-      }
-      if (this.MoveActive) {
-      let newActiveCard = this.getNewActiveCard()
-      this.MoveActive = false
-      }
-    },
-    moveToTheRight () {
-      for (let item in this.StringsRight) {
-        var string = this.StringsRight[item]
-        string.forEach(el => {
-          if (this.cards[el].num && this.cards[el].id !== string[3]) {
-            if (this.cards[el+1].num) {
-              if ( this.cards[el].num === this.cards[el+1].num) {
-              this.cellActive(el+1, el, 2)
-              }
-            } else {
-              this.cellActive(el+1, el, 1)
-            }
-          }
-        })
-      }
-      if (this.MoveActive) {
-      let newActiveCard = this.getNewActiveCard()
-      this.MoveActive = false
-      }
-    },
-    moveToTheDown () {
-       for (let item in this.StringsDown) {
-        var string = this.StringsDown[item]
-        for (let el in string) {
-          let card = string[el]
-          let cardNext = string[+el+1]
-          if (this.cards[card].num && this.cards[card].id !== string[3]) {
-            if (this.cards[cardNext].num) {
-              if ( this.cards[card].num === this.cards[cardNext].num) {
-              this.cellActive(cardNext, card, 2)
-              }
-            } else {
-              this.cellActive(cardNext, card, 1)
-            }
-          }
-        }
-      }
-      if (this.MoveActive) {
-      let newActiveCard = this.getNewActiveCard()
-      this.MoveActive = false
-      }
-    },
-    moveToTheUp () {
-      for (let item in this.StringsUp) {
-        var string = this.StringsUp[item]
+    moveX (strings) {
+      for (let item in strings) {
+        var string = strings[item]
         for (let el in string) {
           let card = string[el]
           let cardNext = string[+el+1]
