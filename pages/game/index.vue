@@ -12,6 +12,7 @@
         @click="startGame">
           New game
         </v-btn>
+        <h1>{{message}}</h1>
       </div>
       <v-card max-height="500" max-width="500">
         <v-container v-bind="{ [`grid-list-${size}`]: true }" fluid>
@@ -48,6 +49,7 @@ export default {
       isGameStarted: false,
       colorCard: 'grey darken-2',
       MoveActive: false,
+      message: 'Join the numbers and get to the 2048 tile',
       StringsLeft: {
         FirstStringX: [3, 2, 1, 0],
         SecondStringX: [7, 6, 5, 4],
@@ -180,6 +182,10 @@ export default {
       window.addEventListener('keyup', this.logKey)
       this.cardsClone = this.cards
     },
+    gameOver (message) {
+      this.isGameStarted = false
+      this.message = message
+    },
     getNewActiveCard () {
       let newActiveCard = Math.floor(Math.random() * ((this.cards.length + 1) - 1))
         if (this.cards[newActiveCard].active !== true) {
@@ -234,9 +240,10 @@ export default {
             if (this.cards[cardNext].num) {
               if ( this.cards[card].num === this.cards[cardNext].num) {
               this.cellActive(cardNext, card, 2)
-              }
+              } 
             } else {
               this.cellActive(cardNext, card, 1)
+              this.moveX(strings)
             }
           }
         }
