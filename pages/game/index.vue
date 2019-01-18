@@ -28,24 +28,13 @@
           alt="2048"
           max-height="500" max-width="500"
           v-if="!isGameStarted"/>
-          <v-layout row wrap
-          v-if="isGameStarted">
-            <v-flex
-              v-for="(card, idx) in cards" :key="idx"
-              xs3>
-              <v-card flat 
-              @keyup.left="moveToTheLeft"
-              lights
-              :color="card.active ? card.colorActiveCard : colorCard"
-              height="100">
-              <v-layout fill-height align-center justify-center>
-              <v-flex class="text-xs-center">
-                <h1>{{card.num}}</h1>
-                </v-flex>
-                </v-layout>
-              </v-card>
-            </v-flex>
-          </v-layout>
+          <Cards
+          :_isGameStarted="isGameStarted"
+          :_cards="cards"
+          :_strings="strings"
+          :_fieldSize="size"
+          @score="scoreCount($event)"
+          />
         </v-container>
       </v-card>
     </v-flex>
@@ -53,15 +42,17 @@
 </template>
 
 <script>
-
+import Cards from '~/components/Cards.vue'
 export default {
+  name: "game",
+  components: {
+    Cards
+  },
   data () {
     return {
       isGameStarted: false,
       size: 16,
       score: 0,
-      colorCard: 'grey darken-2',
-      MoveActive: false,
       message: 'Join the numbers and get to the 2048 tile',
       strings: {
         StringsLeft: {},
@@ -78,15 +69,14 @@ export default {
       this.getCards()
       this.getStringsX()
       this.getStringsY()
-      this.getNewActiveCard()
-      this.getNewActiveCard()
-      window.addEventListener('keyup', this.logKey)
+    },
+    scoreCount (e) {
+      this.score = e
     },
     overGame () {
-      this.score =  0;
       this.isGameStarted = false
+      this.score = 0
       this.cards = []
-      this.MoveActive = false
       this.strings= {
         StringsLeft: {},
         StringsRight: {},
@@ -135,80 +125,6 @@ export default {
         card.num = null,
         card.colorActiveCard = 'teal'
         this.cards.push(card)
-      }
-    },
-    gameOver (message) {
-      this.isGameStarted = false
-      this.message = message
-    },
-    getNewActiveCard () {
-      let newActiveCard = Math.floor(Math.random() * ((this.cards.length + 1) - 1))
-        if (this.cards[newActiveCard].active !== true) {
-          this.cards[newActiveCard].active = true;
-          this.cards[newActiveCard].num = this.randomNum()
-      } else this.getNewActiveCard()
-    },
-    randomNum () {
-      var randomNum = Math.floor(Math.random()*100)
-      if (randomNum < 90) {
-        return 2
-      } 
-      if (randomNum < 100) {
-        return 2
-      } 
-    },
-    logKey(e) {
-      switch (e.keyCode) {
-        case 37:
-          this.moveX(this.strings.StringsLeft)
-          break;
-        case 39:
-          this.moveX(this.strings.StringsRight)
-          break;
-        case 40:
-          this.moveX(this.strings.StringsDown)
-          break;
-        case 38:
-          this.moveX(this.strings.StringsUp)
-      }
-      if (this.MoveActive) {
-        this.getNewActiveCard()
-        this.MoveActive = false
-      }
-    },
-    cellActive (nextEl, el, rate) {
-      this.cards[nextEl].num = this.cards[el].num * rate
-      if (this.cards[nextEl].num < 32) {
-      this.cards[nextEl].colorActiveCard = 'teal  darken-' + (this.cards[nextEl].num / 4)
-      } else if (this.cards[nextEl].num < 513) {
-        this.cards[nextEl].colorActiveCard = 'cyan darken-' + (this.cards[nextEl].num / 32)
-      } else {
-        this.cards[nextEl].colorActiveCard = 'indigo darken-' + (this.cards[nextEl].num / 512)
-      }
-      this.cards[nextEl].active = true
-      this.cards[el].num = null
-      this.cards[el].colorActiveCard = 'teal'
-      this.cards[el].active = false
-      this.MoveActive = true
-    },
-    moveX (strings) {
-      for (let item in strings) {
-        var string = strings[item]
-        for (let el in string) {
-          let card = string[el]
-          let cardNext = string[+el+1]
-          if (this.cards[card].num && this.cards[card].id !== string[3]) {
-            if (this.cards[cardNext].num) {
-              if ( this.cards[card].num === this.cards[cardNext].num) {
-              this.score += this.cards[card].num*2
-              this.cellActive(cardNext, card, 2)
-              } 
-            } else {
-              this.cellActive(cardNext, card, 1)
-              this.moveX(strings)
-            }
-          }
-        }
       }
     }
   }
