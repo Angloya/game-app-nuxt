@@ -8,15 +8,28 @@
       sm8
       md6>
       <div class="text-xs-center">
-        <v-btn  v-if="!isGameStarted" 
-        @click="startGame">
-          New game
-        </v-btn>
-        <h1>{{message}}</h1>
+        <div v-if="!isGameStarted" >
+          <v-btn @click="startGame">
+            New game
+          </v-btn>
+          <h1>{{message}}</h1>
+        </div>
+        <div v-if="isGameStarted" >
+          <v-btn @click="overGame">
+            Finish the game
+          </v-btn>
+          <h1>{{message}}</h1>
+          <h1>Score: {{score}}</h1>
+        </div>
       </div>
       <v-card max-height="500" max-width="500">
         <v-container grid-list-sm fluid>
-          <v-layout row wrap>
+          <v-img src="/img/2048game.png"
+          alt="2048"
+          max-height="500" max-width="500"
+          v-if="!isGameStarted"/>
+          <v-layout row wrap
+          v-if="isGameStarted">
             <v-flex
               v-for="(card, idx) in cards" :key="idx"
               xs3>
@@ -46,6 +59,7 @@ export default {
     return {
       isGameStarted: false,
       size: 16,
+      score: 0,
       colorCard: 'grey darken-2',
       MoveActive: false,
       message: 'Join the numbers and get to the 2048 tile',
@@ -66,8 +80,19 @@ export default {
       this.getStringsY()
       this.getNewActiveCard()
       this.getNewActiveCard()
-      debugger
       window.addEventListener('keyup', this.logKey)
+    },
+    overGame () {
+      this.score =  0;
+      this.isGameStarted = false
+      this.cards = []
+      this.MoveActive = false
+      this.strings= {
+        StringsLeft: {},
+        StringsRight: {},
+        StringsDown: {},
+        StringsUp: {}
+      }
     },
     getStringsX () {
       var strings = {}
@@ -91,7 +116,6 @@ export default {
       for (let i = 0; i < Math.sqrt(this.size); i++) {
         let string = []
         var num = Math.sqrt(this.size) 
-        debugger
         for (let item = i; item < this.size; item+=num) {
           string.push(item)
         }
@@ -125,13 +149,13 @@ export default {
       } else this.getNewActiveCard()
     },
     randomNum () {
-    var randomNum = Math.floor(Math.random()*100)
-    if (randomNum < 90) {
-      return 2
-    } 
-    if (randomNum < 100) {
-      return 2
-    } 
+      var randomNum = Math.floor(Math.random()*100)
+      if (randomNum < 90) {
+        return 2
+      } 
+      if (randomNum < 100) {
+        return 2
+      } 
     },
     logKey(e) {
       switch (e.keyCode) {
@@ -155,9 +179,11 @@ export default {
     cellActive (nextEl, el, rate) {
       this.cards[nextEl].num = this.cards[el].num * rate
       if (this.cards[nextEl].num < 32) {
-      this.cards[nextEl].colorActiveCard = 'teal  accent-' + (this.cards[nextEl].num / 4)
+      this.cards[nextEl].colorActiveCard = 'teal  darken-' + (this.cards[nextEl].num / 4)
+      } else if (this.cards[nextEl].num < 513) {
+        this.cards[nextEl].colorActiveCard = 'cyan darken-' + (this.cards[nextEl].num / 32)
       } else {
-        this.cards[nextEl].colorActiveCard = 'teal  darken-' + (this.cards[nextEl].num / 16)
+        this.cards[nextEl].colorActiveCard = 'indigo darken-' + (this.cards[nextEl].num / 512)
       }
       this.cards[nextEl].active = true
       this.cards[el].num = null
@@ -174,6 +200,7 @@ export default {
           if (this.cards[card].num && this.cards[card].id !== string[3]) {
             if (this.cards[cardNext].num) {
               if ( this.cards[card].num === this.cards[cardNext].num) {
+              this.score += this.cards[card].num*2
               this.cellActive(cardNext, card, 2)
               } 
             } else {
