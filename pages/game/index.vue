@@ -8,6 +8,7 @@
       sm8
       md6>
       <div class="text-xs-center">
+      <v-card max-width="500">
         <div v-if="!isGameStarted" >
           <v-btn @click="startGame">
             New game
@@ -22,8 +23,21 @@
             Finish the game
           </v-btn>
           <h1>{{message}}</h1>
-          <h1>Score: {{score}}</h1>
+          <v-layout 
+            justify-space-between>
+            <v-card light>
+              <v-card-text>
+                <h1>Score: {{score}}</h1>
+              </v-card-text>
+            </v-card>
+            <v-card light>
+              <v-card-text>
+                <h1>Best: {{bestScore}}</h1>
+              </v-card-text>
+            </v-card>
+          </v-layout>
         </div>
+      </v-card>
       </div>
       <v-card max-height="500" max-width="500">
         <v-container grid-list-sm fluid>
@@ -56,7 +70,8 @@ export default {
       isGameStarted: false,
       size: 16,
       score: 0,
-      message: 'Join the numbers and get to the 2048 tile',
+      bestScore: 0,
+      message: 'Join the numbers and get to the 2048',
       strings: {
         StringsLeft: {},
         StringsRight: {},
@@ -64,6 +79,15 @@ export default {
         StringsUp: {}
       },
       cards: []
+    }
+  },
+  mounted() {
+    if (localStorage.getItem('score')) {
+      try {
+        this.bestScore = JSON.parse(localStorage.getItem('score'));
+      } catch(e) {
+        localStorage.removeItem('score');
+      }
     }
   },
   methods: {
@@ -78,6 +102,10 @@ export default {
     },
     overGame () {
       this.isGameStarted = false
+      if (this.bestScore < this.score) {
+              this.bestScore = this.score
+      }
+      this.saveScore()
       this.score = 0
       this.cards = []
       this.strings= {
@@ -129,6 +157,10 @@ export default {
         card.colorActiveCard = 'teal'
         this.cards.push(card)
       }
+    },
+    saveScore() {
+      const parsed = JSON.stringify(this.bestScore);
+      localStorage.setItem('score', parsed);
     }
   }
 }
