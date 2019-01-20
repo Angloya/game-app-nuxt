@@ -59,6 +59,7 @@ export default {
     },
     overGame () {
       this.MoveActive = false
+      this.score = 0
     },
     getNewActiveCard () {
       let newActiveCard = Math.floor(Math.random() * ((this._cards.length + 1) - 1))

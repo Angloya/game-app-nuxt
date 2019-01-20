@@ -12,6 +12,9 @@
           <v-btn @click="startGame">
             New game
           </v-btn>
+          <v-btn nuxt to="/game/rules">
+            Game rules
+          </v-btn>
           <h1>{{message}}</h1>
         </div>
         <div v-if="isGameStarted" >
